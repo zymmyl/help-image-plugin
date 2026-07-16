@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      width: 700px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      padding: 30px;
+      color: #fff;
+    }
+    .container {
+      width: 100%;
+    }
+    .header {
+      text-align: center;
+      padding: 30px 0 25px 0;
+      border-bottom: 2px solid rgba(255,255,255,0.1);
+      margin-bottom: 25px;
+    }
+    .header .title {
+      font-size: 36px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 0 2px 10px rgba(114, 137, 218, 0.5);
+      letter-spacing: 3px;
+    }
+    .header .subtitle {
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 8px;
+      letter-spacing: 1px;
+    }
+    .section {
+      margin-bottom: 25px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #7279d8;
+      padding: 10px 15px;
+      background: rgba(114, 121, 216, 0.15);
+      border-left: 4px solid #7279d8;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+    .cmd-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .cmd-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: all 0.2s;
+    }
+    .cmd-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+    .cmd-icon.normal {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+    }
+    .cmd-icon.admin {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: #fff;
+    }
+    .cmd-content {
+      flex: 1;
+    }
+    .cmd-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #e0e0e0;
+      line-height: 24px;
+    }
+    .cmd-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      line-height: 20px;
+      margin-top: 2px;
+    }
+    .cmd-tag {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .cmd-tag.master {
+      background: rgba(245, 87, 108, 0.2);
+      color: #f5576c;
+      border: 1px solid rgba(245, 87, 108, 0.3);
+    }
+    .cmd-tag.all {
+      background: rgba(102, 126, 234, 0.2);
+      color: #8ba0ff;
+      border: 1px solid rgba(102, 126, 234, 0.3);
+    }
+    .footer {
+      text-align: center;
+      padding: 20px 0 5px 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: 10px;
+    }
+    .footer .author {
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+    }
+    .footer .version {
+      font-size: 12px;
+      color: rgba(255,255,255,0.25);
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title">帮助图片插件</div>
+      <div class="subtitle">Help Image Plugin · 指令帮助</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">普通指令</div>
+      <div class="cmd-list">
+        <div class="cmd-item">
+          <div class="cmd-icon normal">#</div>
+          <div class="cmd-content">
+            <div class="cmd-name">全部帮助<span class="cmd-tag all">所有人</span></div>
+            <div class="cmd-desc">发送所有已保存的帮助图片，2张以上合并转发</div>
+          </div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-icon normal">#</div>
+          <div class="cmd-content">
+            <div class="cmd-name">帮助指令<span class="cmd-tag all">所有人</span></div>
+            <div class="cmd-desc">查看本插件所有指令及用法</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">管理指令</div>
+      <div class="cmd-list">
+        <div class="cmd-item">
+          <div class="cmd-icon admin">#</div>
+          <div class="cmd-content">
+            <div class="cmd-name">上传帮助图<span class="cmd-tag master">主人</span></div>
+            <div class="cmd-desc">引用图片后发送，保存到插件资源目录</div>
+          </div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-icon admin">#</div>
+          <div class="cmd-content">
+            <div class="cmd-name">删除帮助图 序号<span class="cmd-tag master">主人</span></div>
+            <div class="cmd-desc">按序号删除指定帮助图，如：#删除帮助图 3</div>
+          </div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-icon admin">#</div>
+          <div class="cmd-content">
+            <div class="cmd-name">清空帮助图<span class="cmd-tag master">主人</span></div>
+            <div class="cmd-desc">清空所有已保存的帮助图片</div>
+          </div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-icon admin">#</div>
+          <div class="cmd-content">
+            <div class="cmd-name">帮助图数量<span class="cmd-tag master">主人</span></div>
+            <div class="cmd-desc">查看当前帮助图片数量</div>
+          </div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-icon admin">#</div>
+          <div class="cmd-content">
+            <div class="cmd-name">设置帮助图备注 序号 内容<span class="cmd-tag master">主人</span></div>
+            <div class="cmd-desc">设置指定图片的备注文字</div>
+          </div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-icon admin">#</div>
+          <div class="cmd-content">
+            <div class="cmd-name">删除帮助图备注 序号<span class="cmd-tag master">主人</span></div>
+            <div class="cmd-desc">删除指定图片的备注</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="author">作者：zymmyl</div>
+      <div class="version">help-image-plugin v1.0</div>
+    </div>
+  </div>
+</body>
+</html>

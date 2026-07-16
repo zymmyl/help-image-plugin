@@ -1,0 +1,15 @@
+scheduledPush:
+  enabled: false
+  cron: "0 9 * * *"
+
+customText: ""
+
+botList: []
+
+groupBlacklist: []
+groupWhitelist: []
+
+permission:
+  upload: "all"
+  view: "all"
+  manage: "master"
