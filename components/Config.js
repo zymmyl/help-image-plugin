@@ -105,6 +105,18 @@ export default class Config {
     return notes[filename] || ""
   }
 
+  static setNoteByFilename(filename, note) {
+    const notes = this.getAllNotes()
+    notes[filename] = note
+    const file = this.getNotesFile()
+    const dir = path.dirname(file)
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true })
+    }
+    fs.writeFileSync(file, JSON.stringify(notes, null, 2))
+    return true
+  }
+
   static deleteNoteByFilename(filename) {
     const notes = this.getAllNotes()
     if (notes[filename]) {

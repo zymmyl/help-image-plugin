@@ -15,7 +15,7 @@ export class HelpImagePlugin extends plugin {
       priority: 5000,
       rule: [
         {
-          reg: "^#上传帮助图$",
+          reg: "^#上传帮助图(\\s+.+)?$",
           fnc: "uploadHelpImage",
           permission: "master"
         },
@@ -81,6 +81,9 @@ export class HelpImagePlugin extends plugin {
   }
 
   async uploadHelpImage(e) {
+    const noteMatch = e.msg.match(/^#上传帮助图\s+(.+)$/)
+    const noteText = noteMatch ? noteMatch[1].trim() : ""
+
     let sourceMsg = null
 
     if (e.getReply) {
@@ -110,7 +113,13 @@ export class HelpImagePlugin extends plugin {
       return false
     }
 
+    if (noteText && images.length > 1) {
+      await e.reply("带备注上传仅支持单张图片，请只引用一张图片后再发送")
+      return false
+    }
+
     let savedCount = 0
+    const savedFilenames = []
     for (let img of images) {
       try {
         const buffer = await this.downloadImage(img.url)
@@ -119,6 +128,7 @@ export class HelpImagePlugin extends plugin {
         const ext = this.getImageExt(img.url)
         const filepath = Config.saveImage(buffer, ext)
         logger.info(`[帮助图片插件] 保存图片: ${filepath}`)
+        savedFilenames.push(path.basename(filepath))
         savedCount++
       } catch (err) {
         logger.error("[帮助图片插件] 保存图片失败:", err)
@@ -126,7 +136,14 @@ export class HelpImagePlugin extends plugin {
     }
 
     if (savedCount > 0) {
-      await e.reply(`✅ 成功保存 ${savedCount} 张帮助图`)
+      if (noteText && savedFilenames.length > 0) {
+        for (const filename of savedFilenames) {
+          Config.setNoteByFilename(filename, noteText)
+        }
+        await e.reply(`✅ 成功保存 ${savedCount} 张帮助图，已全部设置备注：${noteText}`)
+      } else {
+        await e.reply(`✅ 成功保存 ${savedCount} 张帮助图`)
+      }
       return true
     } else {
       await e.reply("❎ 保存图片失败")
@@ -396,7 +413,7 @@ export class HelpImagePlugin extends plugin {
     }
 
     try {
-      const img = await e.runtime.render("help-image-plugin", "help/index", {}, {
+      const result = await e.runtime.render("help-image-plugin", "help/index", {}, {
         retType: "default",
         beforeRender({ data }) {
           return {
@@ -409,8 +426,8 @@ export class HelpImagePlugin extends plugin {
         }
       })
 
-      if (img) {
-        await e.reply(img)
+      if (result) {
+        return result
       } else {
         await e.reply("渲染失败，请稍后重试")
       }
