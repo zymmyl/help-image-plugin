@@ -9,7 +9,7 @@
 在 Yunzai 根目录执行：
 
 ```bash
-git clone https://github.com/zymmyl/help-image-plugin.git ./plugins/help-image-plugin/
+git clone https://gitee.com/zymmbtu/help-image-plugin.git ./plugins/help-image-plugin/
 ```
 
 安装后重启 Yunzai。

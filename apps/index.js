@@ -579,7 +579,7 @@ export class HelpImagePlugin extends plugin {
       {
         user_id: userId,
         nickname,
-        message: "更多详细信息请前往 GitHub 查看\nhttps://github.com/zymmyl/help-image-plugin/commits/main"
+        message: "更多详细信息请前往 Gitee 查看\nhttps://gitee.com/zymmbtu/help-image-plugin/commits/main"
       }
     ]
   }
