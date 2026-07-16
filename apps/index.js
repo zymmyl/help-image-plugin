@@ -3,6 +3,8 @@ import Config from "../components/Config.js"
 import fs from "fs"
 import path from "path"
 import schedule from "node-schedule"
+import { execCommand, updateState } from "../components/update/common.js"
+import { checkGit, getCommitId, getTime, getLogLines, replyGitError, PLUGIN_NAME } from "../components/update/git.js"
 
 let scheduledJob = null
 
@@ -53,6 +55,11 @@ export class HelpImagePlugin extends plugin {
           reg: "^#帮助指令$",
           fnc: "helpCommand",
           permission: "all"
+        },
+        {
+          reg: "^#更新帮助图(强制)?$",
+          fnc: "updatePlugin",
+          permission: "master"
         }
       ]
     })
@@ -478,5 +485,102 @@ export class HelpImagePlugin extends plugin {
         logger.error(`[帮助图片插件] 向群 ${groupId} 推送失败:`, err)
       }
     }
+  }
+
+  async updatePlugin(e) {
+    if (!e.isMaster) return false
+
+    if (updateState.running) {
+      await e.reply("已有更新命令执行中，请勿重复操作")
+      return true
+    }
+
+    if (!(await checkGit((msg) => e.reply(msg)))) {
+      return true
+    }
+
+    const isForce = e.msg.includes("强制")
+    let command = `git -C ./plugins/${PLUGIN_NAME}/ pull --no-rebase`
+    if (isForce) {
+      command = `git -C ./plugins/${PLUGIN_NAME}/ checkout . && ${command}`
+      await e.reply("正在执行强制更新操作，请稍等")
+    } else {
+      await e.reply("正在执行更新操作，请稍等")
+    }
+
+    const oldCommitId = getCommitId()
+    updateState.running = true
+    const ret = await execCommand(command)
+    updateState.running = false
+
+    if (ret.error) {
+      logger.mark(`[帮助图片插件] 更新失败`)
+      await replyGitError((msg) => e.reply(msg), ret.error, ret.stdout)
+      return true
+    }
+
+    const time = getTime()
+    const stdout = ret.stdout || ""
+
+    if (/(Already up[ -]to[ -]date|已经是最新的)/.test(stdout)) {
+      await e.reply(`帮助图片插件已经是最新版本\n最后更新时间：${time}`)
+    } else {
+      const logMsg = this.getUpdateLog(oldCommitId)
+      if (logMsg) {
+        const forwardMsg = this.buildUpdateForward(time, logMsg)
+        const msg = Bot.makeForwardMsg(forwardMsg)
+        await e.reply(msg)
+      } else {
+        await e.reply(`帮助图片插件更新成功\n最后更新时间：${time}\n请重启 Yunzai 以应用更新`)
+      }
+    }
+
+    logger.mark(`[帮助图片插件] 最后更新时间：${time}`)
+    return true
+  }
+
+  getUpdateLog(oldCommitId) {
+    let logAll
+    try {
+      logAll = getLogLines()
+    } catch (error) {
+      logger.error(error.toString())
+      return ""
+    }
+
+    if (!logAll) return ""
+
+    const logList = logAll.split("\n")
+    const logs = []
+    for (let str of logList) {
+      let item = str.split("||")
+      if (item[0] === oldCommitId) break
+      if (item[1]?.includes("Merge branch")) continue
+      if (item[1]) logs.push(item[1])
+    }
+
+    return logs.join("\n")
+  }
+
+  buildUpdateForward(time, logText) {
+    const userId = Bot.uin || 10000
+    const nickname = Bot.nickname || "帮助图"
+    return [
+      {
+        user_id: userId,
+        nickname,
+        message: `帮助图片插件更新成功\n最后更新时间：${time}\n请重启 Yunzai 以应用更新\n\n更新日志：`
+      },
+      {
+        user_id: userId,
+        nickname,
+        message: logText
+      },
+      {
+        user_id: userId,
+        nickname,
+        message: "更多详细信息请前往 GitHub 查看\nhttps://github.com/zymmyl/help-image-plugin/commits/main"
+      }
+    ]
   }
 }
